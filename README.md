@@ -12,11 +12,13 @@
 
 ## 1. Enforcing Minimum Password Length
 1. Sign in to your Windows Server lab with administrator privileges.
-2. Press Win + R, type gpedit.msc, and press Enter.
+2. Press Win + R, type `gpedit.msc` and press Enter.
 3. Navigate to:
+   
   ```spl
  Computer Configuration → Windows Settings → Security Settings → Account Policies → Password Policy
 ```
+
 4. Double-click Minimum password length.
 5. Set the minimum password length to 14 characters.
 6. Click Apply, then OK to save the configuration.
@@ -25,6 +27,7 @@
 ```spl
 gpupdate /force
 ```
+
 <img width="1376" height="715" alt="Windows Server Password Policy Settings (1)" src="https://github.com/user-attachments/assets/8e4f6d4b-a65b-4f66-860b-5325c36ed39c" />
 
   
