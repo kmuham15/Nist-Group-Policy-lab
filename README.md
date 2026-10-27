@@ -1,12 +1,5 @@
 # Windows Password Policy Implementation Using Group Policy
 
-**Focus:** Windows Server | Active Directory | Group Policy | NIST SP 800-53 | GRC
-
-## Project Overview
-This beginner-friendly security governance lab demonstrates how to configure, apply, and validate a Windows password policy using Group Policy. The exercise connects practical Windows administration with NIST SP 800-53 security control concepts, especially **IA-5 (Authenticator Management)** and related **AC-2 (Account Management)** practices.
-
-
-
 ## Objective
 - Strengthened password security by configuring minimum password requirements.
 - Enabled password complexity to improve account protection.
@@ -16,18 +9,6 @@ This beginner-friendly security governance lab demonstrates how to configure, ap
 - Validated password policy enforcement through testing.
 - Aligned technical security configurations with NIST SP 800-53 controls to demonstrate practical GRC implementation.
 
-**Important distinction:** Run `gpmc.msc` to open **Group Policy Management** for domain GPOs. Run `gpedit.msc` to edit **Local Group Policy**. These are different tools. For domain account password policy, configure a GPO linked at the **domain root** (commonly the Default Domain Policy or another appropriately prioritized domain-linked GPO). A GPO linked only to a workstation OU will not normally set the password policy for domain accounts. Fine-grained password policies are another option for different domain user groups.
-
-## Password Policy Configuration
-
-| Setting | Lab value | Purpose |
-|---|---|---|
-| Minimum password length | 14 characters | Require longer passwords in this exercise |
-| Password must meet complexity requirements | Enabled | Enforce the lab's composition rule |
-| Enforce password history | 5 remembered passwords | Limit immediate reuse |
-| Maximum password age | 90 days | Demonstrate an organization-defined expiration rule |
-
-Before applying changes, verify that test accounts and recovery access are ready. Changing minimum length does **not** automatically invalidate existing shorter passwords; it is enforced when passwords are created or changed.
 
 ## 1. Enforcing Minimum Password Length
 1. Sign in to your Windows Server lab with administrator privileges.
