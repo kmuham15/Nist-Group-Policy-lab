@@ -5,134 +5,169 @@
 ## Project Overview
 This beginner-friendly security governance lab demonstrates how to configure, apply, and validate a Windows password policy using Group Policy. The exercise connects practical Windows administration with NIST SP 800-53 security control concepts, especially **IA-5 (Authenticator Management)** and related **AC-2 (Account Management)** practices.
 
-> **Lab scope:** The password settings below are exercise-specific requirements, **not universal NIST SP 800-53 requirements**. NIST SP 800-53 is a control catalog rather than a fixed Windows password-policy checklist. Modern NIST digital identity guidance generally discourages routine password expiration absent evidence of compromise and favors longer passwords, screening against compromised passwords, and avoiding arbitrary composition rules. This lab illustrates a specified organizational policy, not a claim of full NIST compliance.
+
 
 ## Objective
-- Create and link a Group Policy Object (GPO) in an authorized Windows Server lab.
-- Configure the required password settings.
-- Update Group Policy on a test machine and verify effective policy.
-- Test password rejection and record evidence.
-- Explain the relevance of IA-5 and AC-2.
-
-## Lab Environment
-- Windows Server with Active Directory Domain Services and Group Policy Management (for a domain GPO), or a standalone Windows system with Local Group Policy Editor.
-- An authorized test user and a test workstation.
-- Administrative privileges to manage the relevant policy.
+- Strengthened password security by configuring minimum password requirements.
+- Enabled password complexity to improve account protection.
+- Enforced password history to prevent immediate password reuse.
+- Configured password expiration to support security compliance.
+- Applied and updated Group Policy settings to enforce security requirements.
+- Validated password policy enforcement through testing.
+- Aligned technical security configurations with NIST SP 800-53 controls to demonstrate practical GRC implementation.
 
 **Important distinction:** Run `gpmc.msc` to open **Group Policy Management** for domain GPOs. Run `gpedit.msc` to edit **Local Group Policy**. These are different tools. For domain account password policy, configure a GPO linked at the **domain root** (commonly the Default Domain Policy or another appropriately prioritized domain-linked GPO). A GPO linked only to a workstation OU will not normally set the password policy for domain accounts. Fine-grained password policies are another option for different domain user groups.
 
-## Lab Password Policy
+## Password Policy Configuration
+
 | Setting | Lab value | Purpose |
 |---|---|---|
-| Minimum password length | 12 characters | Require longer passwords in this exercise |
+| Minimum password length | 14 characters | Require longer passwords in this exercise |
 | Password must meet complexity requirements | Enabled | Enforce the lab's composition rule |
 | Enforce password history | 5 remembered passwords | Limit immediate reuse |
 | Maximum password age | 90 days | Demonstrate an organization-defined expiration rule |
 
 Before applying changes, verify that test accounts and recovery access are ready. Changing minimum length does **not** automatically invalidate existing shorter passwords; it is enforced when passwords are created or changed.
 
-## Implementation
-### 1. Open Group Policy Management
-1. Sign in to the authorized Windows Server lab.
-2. Press **Win + R**, enter `gpmc.msc`, and press Enter.
-3. Locate the lab domain and the appropriate domain-linked GPO.
-4. Create a new GPO if needed, then link it at the domain root and confirm its precedence. Avoid changing production policy without authorization.
+## 1. Enforcing Minimum Password Length
+1. Sign in to your Windows Server lab with administrator privileges.
+2. Press Win + R, type gpedit.msc, and press Enter.
+3. Navigate to:
+  ```spl
+ Computer Configuration → Windows Settings → Security Settings → Account Policies → Password Policy
+```
+4. Double-click Minimum password length.
+5. Set the minimum password length to 14 characters.
+6. Click Apply, then OK to save the configuration.
+7. Open Command Prompt as Administrator and run:
 
-![Group Policy Management and selected GPO](screenshots/01-gpo-overview.png)
-
-### 2. Edit the Password Policy
-Right-click the GPO and choose **Edit**. Navigate to:
-
-`Computer Configuration > Policies > Windows Settings > Security Settings > Account Policies > Password Policy`
-
-![Password Policy settings](screenshots/02-password-policy.png)
-
-### 3. Configure the Required Settings
-- **Minimum password length:** 12 characters.
-- **Password must meet complexity requirements:** Enabled.
-- **Enforce password history:** 5 passwords remembered.
-- **Maximum password age:** 90 days.
-
-Save the changes and confirm the GPO is linked and applied at the intended scope.
-
-![Minimum password length](screenshots/03-minimum-length.png)
-
-![Complexity and password history](screenshots/04-complexity-history.png)
-
-![Maximum password age](screenshots/05-maximum-age.png)
-
-### 4. Apply and Verify
-On the test workstation, open Command Prompt as appropriate and run:
-
-```cmd
+```spl
 gpupdate /force
 ```
+<img width="1376" height="715" alt="Windows Server Password Policy Settings (1)" src="https://github.com/user-attachments/assets/8e4f6d4b-a65b-4f66-860b-5325c36ed39c" />
+
+  
+## 2. Edit the Password Policy
+Enabled 
+"Password must meet complexity requirements" to enforce stronger password standards, prevent weak password creation, and enhance account security against unauthorized access.
+
+
+<img width="1314" height="829" alt="Windows 11 Password Policy Settings" src="https://github.com/user-attachments/assets/7ac2e8bc-45e8-4c82-94a0-7cd5519c1b14" />
+
+
+
+## 3. Enforcing Password History
+
+Configured Windows Group Policy to remember the 5 most recent passwords, preventing users from immediately reusing previous credentials and strengthening overall account security.
+
+<img width="895" height="905" alt="Windows Password Policy Settings Dialog" src="https://github.com/user-attachments/assets/7c05fbb7-05fa-4187-a9a3-4e303da46896" />
+
+
+## 4. Enforcing Maximum Password Age
+
+Configured Windows Group Policy to enforce a 90-day maximum password age, requiring users to update their passwords after the specified period to support password lifecycle management and account security.
 
 For a domain account policy, verify the effective policy at the domain level, rather than relying on the workstation's Group Policy refresh alone. Useful commands include:
 
-```cmd
-net accounts /domain
-gpresult /r
+<img width="763" height="824" alt="Windows 11 Password Age Settings" src="https://github.com/user-attachments/assets/310debc5-8442-4188-b422-f01101c8d3f2" />
+
+## 5. Applying the Updated Group Policy
+
+After configuring the password security policies, I opened Command Prompt with administrator privileges and executed:
+
+```spl
+gpupdate /force
 ```
 
-`net accounts /domain` helps inspect the domain's effective account policy; `gpresult /r` helps identify applied GPOs but does not by itself prove the domain password settings. Replication and policy refresh timing can affect results.
+This command refreshed the Group Policy settings to apply the latest security configurations.
 
-![Group Policy refresh](screenshots/06-gpupdate.png)
+Both Computer Policy and User Policy updates completed successfully, confirming that the policy refresh was processed without errors.
 
-### 5. Test the Policy
-Using an **authorized disposable test account**, attempt to change the password to a value shorter than 12 characters or one that fails the configured complexity requirement. Record whether Windows rejects it. Then test a compliant password and confirm it is accepted. Avoid recording or publishing actual passwords.
+<img width="677" height="383" alt="Screenshot 2026-10-27 184702" src="https://github.com/user-attachments/assets/339b8cad-2241-4f8d-96eb-c7adbd890abf" />
 
-For password-history testing, remember that the setting takes effect as passwords are changed and requires sufficient password history to exist. For maximum-age testing, inspect effective policy rather than waiting 90 days.
+## 6. Testing and Validating Password Policy Enforcement
 
-![Password policy validation](screenshots/07-password-rejection.png)
+After applying the updated Group Policy settings, I used a dedicated test account named `PolicyTest` to evaluate password policy enforcement.
 
-## Evidence and Results
-> Replace the placeholders below only after completing the lab. Do not present expected results as observations.
+I executed the following command to initiate password changes:
 
-| Check | Expected result | Actual result |
-|---|---|---|
-| GPO linked at domain root | Correct scope and precedence | Pending test |
-| Minimum length | 12 characters | Pending test |
-| Complexity | Enabled | Pending test |
-| Password history | 5 remembered | Pending test |
-| Maximum age | 90 days | Pending test |
-| Policy update | Completed without relevant errors | Pending test |
-| Weak password attempt | Rejected | Pending test |
-| Compliant password attempt | Accepted | Pending test |
-
-## NIST SP 800-53 Control Mapping
-| Control | Relevance to this lab |
-|---|---|
-| **IA-5 — Authenticator Management** | Password/authenticator lifecycle, policy management, and protection; strongest direct mapping. |
-| **AC-2 — Account Management** | Broader governance of user accounts and account-related processes; password settings alone do not implement the full control. |
-
-**Compliance note:** The configuration does not establish NIST compliance by itself. Actual compliance requires organization-defined parameters, supporting processes, evidence, and assessment against the applicable control baseline and current identity guidance.
-
-## Lessons Learned (complete after testing)
-- How a domain-linked GPO differs from local Group Policy.
-- How password requirements are defined and applied through Windows security policy.
-- How to validate policy application instead of assuming `gpupdate` alone proves enforcement.
-- How to map technical configuration evidence to IA-5 and related AC-2 governance.
-- Why policy settings must be evaluated against current standards and organizational risk requirements.
-
-## Repository Structure
-```text
-Windows-Password-Policy-GPO-NIST-800-53/
-├── README.md
-└── screenshots/
-    ├── 01-gpo-overview.png
-    ├── 02-password-policy.png
-    ├── 03-minimum-length.png
-    ├── 04-complexity-history.png
-    ├── 05-maximum-age.png
-    ├── 06-gpupdate.png
-    └── 07-password-rejection.png
+```
+net user PolicyTest *
 ```
 
-## References
-- [NIST SP 800-53 Rev. 5 — Security and Privacy Controls](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)
-- [NIST SP 800-63B — Digital Identity Guidelines: Authentication and Lifecycle Management](https://pages.nist.gov/800-63-4/sp800-63b.html)
-- [Microsoft Learn — Password Policy](https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy)
+This testing process helped validate whether the configured password security requirements were actively enforced, rather than simply applied within Group Policy.
 
-## Disclaimer
-This is an educational lab project. Use only authorized test systems and redact sensitive information from screenshots.
+
+## 7. Weak Password Validation Test
+
+Attempted to set a password that failed to meet the configured security requirements.
+
+Windows successfully rejected the password and displayed a policy violation message, confirming that the password security controls were actively enforced and functioning as intended.
+
+<img width="1644" height="888" alt="Windows 11 Administrator Command Prompt" src="https://github.com/user-attachments/assets/47d35e16-4e19-4cff-ac83-23d84d6b3d61" />
+
+## 8. Strong Password Validation Test
+
+Repeated the password validation test using a password that met all configured security requirements.
+
+Windows successfully accepted the password and displayed the confirmation message:
+
+`The command completed successfully`
+
+This verified that the password policy was functioning as intended, allowing compliant passwords while rejecting those that failed to meet the established security standards.
+
+<img width="1635" height="856" alt="Windows 11 Administrator Command Prompt Session" src="https://github.com/user-attachments/assets/55c0239d-ff05-4073-bad5-5da6d2c601af" />
+
+## 9. NIST 800-53 Control Mapping
+
+ AC-2 – Account Management
+
+NIST 800-53 AC-2 focuses on the administration, monitoring, and protection of system accounts.
+
+The password policies configured in this lab complement account management practices by strengthening authentication requirements and reducing the risk of unauthorized account access.
+
+IA-5 – Authenticator Management
+
+NIST 800-53 IA-5 addresses the secure management of authentication credentials, including passwords.
+
+This lab demonstrated the practical implementation of authenticator management controls by enforcing password complexity, establishing minimum password lengths, restricting password reuse, and configuring password expiration policies to strengthen account security.
+
+## Validation Results
+
+This lab successfully demonstrated the security control implementation lifecycle:
+
+Configure → Apply → Test → Validate
+
+ Key Outcomes
+
+- Successfully established a 14-character minimum password length.
+- Enabled password complexity requirements to strengthen authentication security.
+- Enforced password history to prevent reuse of the previous 5 passwords.
+- Configured a 90-day maximum password age.
+- Successfully applied updated security settings using Group Policy.
+- Verified that weak passwords were rejected for failing security requirements.
+- Confirmed that compliant passwords were accepted.
+- Validated that the configured password security controls operated as intended.
+
+These results demonstrated the successful implementation and testing of password security policies while reinforcing practical knowledge of NIST 800-53 security control implementation and validation.
+
+## Key Takeaways
+
+This lab provided valuable hands-on experience in translating **NIST 800-53 security requirements into practical Windows Server configurations**.
+
+Rather than focusing solely on security policies and compliance frameworks, I implemented password security controls, tested their effectiveness, and verified that they operated as intended.
+
+Throughout this lab, I strengthened my skills in:
+
+- Windows Group Policy administration
+- Password policy configuration and enforcement
+- Authentication and account security
+- Security control implementation and validation
+- Windows command-line administration
+- Microsoft Azure Windows Server management
+- NIST 800-53 security control mapping
+- Governance, Risk, and Compliance (GRC)
+
+**My biggest takeaway** Implementing a security control is only part of the process. Effective security requires continuous testing, validation, and documented evidence to ensure controls are functioning as intended.
+
+This lab reinforced my understanding of how technical security measures support organizational security policies, risk management, and compliance objectives.
